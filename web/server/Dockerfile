@@ -15,6 +15,14 @@ COPY . .
 # Set environment to production
 ENV NODE_ENV=production
 
+# Create non-root user for security
+RUN groupadd -r appuser -g 10014 && \
+    useradd -r -u 10014 -g appuser -d /app -s /sbin/nologin appuser && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER 10014
+
 # Expose the port (default 8000, can be overridden)
 EXPOSE 8000
 
