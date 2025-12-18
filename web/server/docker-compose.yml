@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # MCP Metrics Server
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-metrics-server
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - MONGO_URL=${MONGO_URL}
+      - POSTGRES_URL=${POSTGRES_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY:-7d}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-100}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - mongo
+    networks:
+      - mcp-network
+
+  # MongoDB (optional - for local development)
+  mongo:
+    image: mongo:7
+    container_name: mcp-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=mcp_metrics
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local

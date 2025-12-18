@@ -1,0 +1,45 @@
+{
+  "events": [
+    {
+      "callId": "cf5a38b1-d396-4cfd-add2-2307ddd268c0",
+      "toolName": "todos_add",
+      "timestamp": "2025-12-14T18:50:10.885Z",
+      "duration": 15,
+      "inputSize": 31,
+      "outputSize": 243,
+      "success": true
+    },
+    {
+      "callId": "dca6a44f-cca1-4c27-977b-1153bb8b8b41",
+      "toolName": "todos_add",
+      "timestamp": "2025-12-14T18:50:21.922Z",
+      "duration": 1,
+      "inputSize": 46,
+      "outputSize": 258,
+      "success": true
+    },
+    {
+      "callId": "53285c28-9a75-47d2-b240-847af3231cce",
+      "toolName": "todos_add",
+      "timestamp": "2025-12-14T19:04:46.543Z",
+      "duration": 1,
+      "inputSize": 31,
+      "outputSize": 243,
+      "success": true
+    }
+  ],
+  "stats": {
+    "todos_add": {
+      "toolName": "todos_add",
+      "totalCalls": 3,
+      "successCount": 3,
+      "failureCount": 0,
+      "avgDuration": 5.666666666666667,
+      "minDuration": 1,
+      "maxDuration": 15,
+      "lastCalled": "2025-12-14T19:04:46.543Z",
+      "errors": []
+    }
+  },
+  "lastUpdated": "2025-12-14T19:04:46.543Z"
+}

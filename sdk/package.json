@@ -1,0 +1,23 @@
+{
+  "name": "@local/mcp-monitor-sdk",
+  "version": "0.1.0",
+  "description": "Monitoring SDK for MCP servers - tracks tool metrics and persists to JSON",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "zod": "^4.0.0",
+    "ky": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prettier": "^3.7.4",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
