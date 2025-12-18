@@ -1,15 +1,17 @@
-# Use official Bun image
-FROM oven/bun:1 AS base
+# Use official Node.js image
+FROM node:20-slim AS base
 WORKDIR /app
 
 # Install dependencies
 FROM base AS install
-COPY package.json package-lock.json* bun.lockb* .npmrc ./
-RUN bun install --production
+COPY package.json package-lock.json* .npmrc ./
+RUN npm ci --production
 
 # Copy source code
 FROM base AS build
 COPY --from=install /app/node_modules ./node_modules
+COPY package.json package-lock.json* .npmrc ./
+RUN npm ci
 COPY . .
 
 # Set environment to production
@@ -28,7 +30,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD bun run -e "fetch('http://localhost:8000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+  CMD node -e "fetch('http://localhost:8000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 # Run the application
-CMD ["bun", "run", "src/index.ts"]
+CMD ["npm", "start"]

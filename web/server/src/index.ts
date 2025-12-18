@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serve } from "@hono/node-server";
 import { validateEnv } from "./config/env";
 import { Logger } from "./utils/logger";
 import { shutdownManager } from "./utils/shutdown";
@@ -82,15 +83,15 @@ const startServer = async () => {
 
     return {
         port: env.PORT,
-        fetch: app.fetch,
+        app,
     };
 };
 
 startServer()
-    .then((server) => {
-        Bun.serve({
-            port: server.port,
-            fetch: server.fetch,
+    .then(({ port, app }) => {
+        serve({
+            fetch: app.fetch,
+            port,
         });
     })
     .catch((error) => {

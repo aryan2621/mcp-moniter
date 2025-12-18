@@ -13,7 +13,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@hono/node-server": "^1.0.0",
     "@hono/zod-validator": "^0.2.0",
+    "bcrypt": "^5.1.0",
     "drizzle-orm": "^0.30.0",
     "hono": "^4.0.0",
     "jose": "^5.2.0",
@@ -22,7 +24,7 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bcrypt": "^5.0.0",
     "@types/node": "^20.0.0",
     "drizzle-kit": "^0.20.0",
     "prettier": "^3.0.0",

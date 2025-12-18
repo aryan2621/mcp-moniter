@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import bcrypt from "bcrypt";
 import { getEnv } from "../config/env";
 import type { JwtPayload } from "../types/index";
 
@@ -8,17 +9,14 @@ function getSecret(): Uint8Array {
 }
 
 export async function hashPassword(password: string): Promise<string> {
-    return await Bun.password.hash(password, {
-        algorithm: "bcrypt",
-        cost: 12,
-    });
+    return await bcrypt.hash(password, 12);
 }
 
 export async function verifyPassword(
     password: string,
     hash: string
 ): Promise<boolean> {
-    return await Bun.password.verify(password, hash);
+    return await bcrypt.compare(password, hash);
 }
 
 export async function generateJWT(payload: JwtPayload): Promise<string> {
