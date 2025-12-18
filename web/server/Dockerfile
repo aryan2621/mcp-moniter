@@ -4,24 +4,24 @@ WORKDIR /app
 
 # Install dependencies
 FROM base AS install
-COPY package.json package-lock.json* bun.lockb* ./
+COPY web/server/package.json web/server/package-lock.json* web/server/bun.lockb* ./
 RUN bun install --frozen-lockfile --production
 
 # Copy source code
 FROM base AS build
 COPY --from=install /app/node_modules ./node_modules
-COPY . .
+COPY web/server/ .
 
 # Set environment to production
 ENV NODE_ENV=production
 
 # Create non-root user for security
-RUN groupadd -r appuser -g 10014 && \
-    useradd -r -u 10014 -g appuser -d /app -s /sbin/nologin appuser && \
+RUN addgroup --system --gid 10014 appuser && \
+    adduser --system --uid 10014 --ingroup appuser --home /app --no-create-home appuser && \
     chown -R appuser:appuser /app
 
 # Switch to non-root user
-USER 10014
+USER appuser
 
 # Expose the port (default 8000, can be overridden)
 EXPOSE 8000
