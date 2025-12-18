@@ -4,13 +4,13 @@ WORKDIR /app
 
 # Install dependencies
 FROM base AS install
-COPY web/server/package.json web/server/package-lock.json* web/server/bun.lockb* ./
+COPY package.json package-lock.json* bun.lockb* ./
 RUN bun install --frozen-lockfile --production
 
 # Copy source code
 FROM base AS build
 COPY --from=install /app/node_modules ./node_modules
-COPY web/server/ .
+COPY . .
 
 # Set environment to production
 ENV NODE_ENV=production
