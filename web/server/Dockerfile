@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 FROM base AS install
-COPY package.json package-lock.json* bun.lockb* ./
+COPY package.json package-lock.json* bun.lockb* .npmrc ./
 RUN bun install --production
 
 # Copy source code
@@ -16,8 +16,8 @@ COPY . .
 ENV NODE_ENV=production
 
 # Create non-root user for security
-RUN addgroup --system --gid 10014 appuser && \
-    adduser --system --uid 10014 --ingroup appuser --home /app --no-create-home appuser && \
+RUN groupadd -g 10014 appuser && \
+    useradd -u 10014 -g appuser -d /app -s /bin/sh appuser && \
     chown -R appuser:appuser /app
 
 # Switch to non-root user
