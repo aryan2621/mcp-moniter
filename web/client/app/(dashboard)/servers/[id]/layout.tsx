@@ -4,7 +4,9 @@ import { use } from 'react'
 import { useServer } from '@/hooks/use-servers'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { NoDataFound } from '@/components/common/no-data-found'
 import { formatDate } from '../../../../lib/utils'
+import { ServerCrash } from 'lucide-react'
 
 export default function ServerLayout({
   children,
@@ -27,7 +29,18 @@ export default function ServerLayout({
   }
 
   if (!server) {
-    return <div>Server not found</div>
+    return (
+      <NoDataFound
+        icon={ServerCrash}
+        title="Server not found"
+        description="This server may have been deleted or you don't have access to it."
+        variant="standalone"
+        action={{
+          label: 'Back to Servers',
+          href: '/servers',
+        }}
+      />
+    )
   }
 
   return (

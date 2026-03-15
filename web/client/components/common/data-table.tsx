@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { NoDataFound } from '@/components/common/no-data-found'
 
 interface Column<T> {
   header: string
@@ -41,8 +42,8 @@ export function DataTable<T>({
 
   if (data.length === 0) {
     return (
-      <div className="flex h-32 items-center justify-center rounded-lg border">
-        <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+      <div className="rounded-md border">
+        <NoDataFound title={emptyMessage} variant="inline" />
       </div>
     )
   }

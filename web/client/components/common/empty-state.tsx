@@ -1,5 +1,5 @@
-import { LucideIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import type { LucideIcon } from 'lucide-react'
+import { NoDataFound } from './no-data-found'
 
 interface EmptyStateProps {
   icon: LucideIcon
@@ -11,13 +11,14 @@ interface EmptyStateProps {
   }
 }
 
-export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-      <Icon className="mb-4 h-10 w-10 text-muted-foreground" />
-      <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-      <p className="mb-4 text-sm text-muted-foreground">{description}</p>
-      {action && <Button onClick={action.onClick}>{action.label}</Button>}
-    </div>
+    <NoDataFound
+      icon={icon}
+      title={title}
+      description={description}
+      action={action}
+      variant="standalone"
+    />
   )
 }

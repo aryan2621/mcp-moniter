@@ -4,6 +4,7 @@ import { useServers } from '@/hooks/use-servers'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { NoDataFound } from '@/components/common/no-data-found'
 import { formatDate } from '@/lib/utils'
 import { Server } from 'lucide-react'
 
@@ -44,7 +45,12 @@ export function RecentActivity() {
       </CardHeader>
       <CardContent>
         {recentServers.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No servers yet</p>
+          <NoDataFound
+            icon={Server}
+            title="No servers yet"
+            description="Create a server to start monitoring"
+            variant="inline"
+          />
         ) : (
           <div className="space-y-4">
             {recentServers.map((server) => (

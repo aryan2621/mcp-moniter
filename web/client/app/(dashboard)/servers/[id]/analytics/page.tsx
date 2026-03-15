@@ -9,7 +9,8 @@ import { ToolUsageChart } from '@/components/analytics/tool-usage-chart'
 import { ErrorRateChart } from '@/components/analytics/error-rate-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Activity, CheckCircle2, Clock, XCircle, Key } from 'lucide-react'
+import { NoDataFound } from '@/components/common/no-data-found'
+import { Activity, BarChart2, CheckCircle2, Clock, XCircle, Key } from 'lucide-react'
 import { formatDuration } from '@/lib/utils'
 
 export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -77,28 +78,39 @@ export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: 
         ))}
       </div>
 
-      {overview?.totalCalls !== 0 && (
-        perfLoading ? (
-          <Skeleton className="h-[400px]" />
-        ) : (
-          <PerformanceChart data={performance || []} />
-        )
-      )}
+      {!overviewLoading && (overview?.totalCalls ?? 0) === 0 ? (
+        <NoDataFound
+          icon={BarChart2}
+          title="No analytics data yet"
+          description="Tool call metrics will appear here once your MCP server starts sending data."
+          variant="standalone"
+        />
+      ) : (
+        <>
+          {overview?.totalCalls !== 0 && (
+            perfLoading ? (
+              <Skeleton className="h-[400px]" />
+            ) : (
+              <PerformanceChart data={performance || []} />
+            )
+          )}
 
-      {overview?.totalCalls !== 0 && (
-        toolsLoading ? (
-          <Skeleton className="h-[400px]" />
-        ) : (
-          <ToolUsageChart data={toolUsage || []} />
-        )
-      )}
+          {overview?.totalCalls !== 0 && (
+            toolsLoading ? (
+              <Skeleton className="h-[400px]" />
+            ) : (
+              <ToolUsageChart data={toolUsage || []} />
+            )
+          )}
 
-      {overview?.totalCalls !== 0 && (
-        errorsLoading ? (
-          <Skeleton className="h-[400px]" />
-        ) : (
-          <ErrorRateChart data={errors || []} />
-        )
+          {overview?.totalCalls !== 0 && (
+            errorsLoading ? (
+              <Skeleton className="h-[400px]" />
+            ) : (
+              <ErrorRateChart data={errors || []} />
+            )
+          )}
+        </>
       )}
     </div>
   )
