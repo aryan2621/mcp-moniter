@@ -1,19 +1,39 @@
 import { z } from "zod";
 import { ConfigurationError } from "../errors/index.js";
 
-const DEFAULT_METRICS_SERVER_URL = "http://localhost:8000/v1/metrics";
+const DEFAULT_METRICS_SERVER_URL =
+  "https://mcp-metrics-server.just-a-dev.workers.dev/v1/metrics";
 const DEFAULT_TIMEOUT = 5000;
 const DEFAULT_RETRY_ATTEMPTS = 2;
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_LOG_LEVEL = "info";
 
+export const MONITOR_LIMITS = {
+  MAX_BATCH_SIZE: 500,
+  MAX_RETRY_ATTEMPTS: 5,
+  MAX_TIMEOUT_MS: 30_000,
+  MAX_PENDING_EVENTS: 10_000,
+} as const;
+
 export const MonitorOptionsSchema = z.object({
   apiKey: z.string().min(64),
   metricsServerUrl: z.string().url().optional(),
-  batchSize: z.number().positive().optional(),
+  batchSize: z
+    .number()
+    .positive()
+    .max(MONITOR_LIMITS.MAX_BATCH_SIZE)
+    .optional(),
   logLevel: z.enum(["debug", "info", "warn", "error", "silent"]).optional(),
-  timeout: z.number().positive().optional(),
-  retryAttempts: z.number().nonnegative().optional(),
+  timeout: z
+    .number()
+    .positive()
+    .max(MONITOR_LIMITS.MAX_TIMEOUT_MS)
+    .optional(),
+  retryAttempts: z
+    .number()
+    .nonnegative()
+    .max(MONITOR_LIMITS.MAX_RETRY_ATTEMPTS)
+    .optional(),
 });
 
 export interface ValidatedMonitorOptions {

@@ -1,7 +1,4 @@
-import { MonitoredMcpServer } from "./monitored-server.js";
-import type { ServerOptions } from "@modelcontextprotocol/sdk/server/index.js";
 import type { Implementation } from "@modelcontextprotocol/sdk/types.js";
-import type { MonitorOptions } from "./types.js";
 
 export { MonitoredMcpServer } from "./monitored-server.js";
 export { MetricsCollector } from "./metrics-collector.js";
@@ -29,6 +26,7 @@ export {
 export {
   validateMonitorOptions,
   MonitorOptionsSchema,
+  MONITOR_LIMITS,
   type ValidatedMonitorOptions,
 } from "./config/index.js";
 

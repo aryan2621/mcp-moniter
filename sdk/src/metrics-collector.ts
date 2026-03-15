@@ -2,6 +2,7 @@ import type { ToolCallEvent } from "./types.js";
 import type { Transport } from "./transport/transport.js";
 import type { Logger } from "./logger/logger.js";
 import { EventBuffer } from "./core/event-buffer.js";
+import { MONITOR_LIMITS } from "./config/validator.js";
 
 export class MetricsCollector {
   private buffer: EventBuffer;
@@ -10,9 +11,10 @@ export class MetricsCollector {
   constructor(
     batchSize: number,
     private logger: Logger,
-    transport?: Transport
+    transport?: Transport,
+    maxPending = MONITOR_LIMITS.MAX_PENDING_EVENTS
   ) {
-    this.buffer = new EventBuffer(batchSize);
+    this.buffer = new EventBuffer(batchSize, maxPending, logger);
     this.transport = transport;
   }
 
