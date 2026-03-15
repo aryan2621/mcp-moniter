@@ -8,9 +8,10 @@ import { PerformanceChart } from '@/components/analytics/performance-chart'
 import { ToolUsageChart } from '@/components/analytics/tool-usage-chart'
 import { ErrorRateChart } from '@/components/analytics/error-rate-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { NoDataFound } from '@/components/common/no-data-found'
-import { Activity, BarChart2, CheckCircle2, Clock, XCircle, Key } from 'lucide-react'
+import { Activity, BarChart2, CheckCircle2, Clock, XCircle, Key, LineChart, PieChart, AlertCircle } from 'lucide-react'
 import { formatDuration } from '@/lib/utils'
 
 export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -86,31 +87,43 @@ export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: 
           variant="standalone"
         />
       ) : (
-        <>
-          {overview?.totalCalls !== 0 && (
-            perfLoading ? (
-              <Skeleton className="h-[400px]" />
+        <Tabs defaultValue="performance" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-3">
+            <TabsTrigger value="performance" className="gap-1.5">
+              <LineChart className="h-4 w-4 shrink-0" />
+              Performance
+            </TabsTrigger>
+            <TabsTrigger value="tool-usage" className="gap-1.5">
+              <BarChart2 className="h-4 w-4 shrink-0" />
+              Tool usage
+            </TabsTrigger>
+            <TabsTrigger value="errors" className="gap-1.5">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              Errors
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="performance" className="mt-4">
+            {perfLoading ? (
+              <Skeleton className="h-[400px] w-full" />
             ) : (
               <PerformanceChart data={performance || []} />
-            )
-          )}
-
-          {overview?.totalCalls !== 0 && (
-            toolsLoading ? (
-              <Skeleton className="h-[400px]" />
+            )}
+          </TabsContent>
+          <TabsContent value="tool-usage" className="mt-4">
+            {toolsLoading ? (
+              <Skeleton className="h-[400px] w-full" />
             ) : (
               <ToolUsageChart data={toolUsage || []} />
-            )
-          )}
-
-          {overview?.totalCalls !== 0 && (
-            errorsLoading ? (
-              <Skeleton className="h-[400px]" />
+            )}
+          </TabsContent>
+          <TabsContent value="errors" className="mt-4">
+            {errorsLoading ? (
+              <Skeleton className="h-[400px] w-full" />
             ) : (
               <ErrorRateChart data={errors || []} />
-            )
-          )}
-        </>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   )

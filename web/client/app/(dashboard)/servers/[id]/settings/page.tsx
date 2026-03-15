@@ -6,13 +6,14 @@ import { useApiKeys } from '@/hooks/use-apikeys'
 import { EditServerDialog } from '@/components/servers/edit-server-dialog'
 import { DeleteServerDialog } from '@/components/servers/delete-server-dialog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/common/data-table'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/common/copy-button'
 import { toast } from '@/hooks/use-toast'
 import { formatDate } from '@/lib/utils'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Server, Key, AlertTriangle } from 'lucide-react'
 import type { ApiKey } from '@/types'
 
 export default function ServerSettingsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -110,75 +111,97 @@ export default function ServerSettingsPage({ params }: { params: Promise<{ id: s
   ]
 
   return (
-    <div className="space-y-4 pt-2">
+    <div className="pt-2">
+      <Tabs defaultValue="details" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsTrigger value="details" className="gap-1.5">
+            <Server className="h-4 w-4 shrink-0" />
+            Details
+          </TabsTrigger>
+          <TabsTrigger value="api-keys" className="gap-1.5">
+            <Key className="h-4 w-4 shrink-0" />
+            API Keys
+          </TabsTrigger>
+          <TabsTrigger value="danger" className="gap-1.5">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            Danger zone
+          </TabsTrigger>
+        </TabsList>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Server Details</CardTitle>
-          <CardDescription>Manage your server information</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="mb-2 text-sm font-medium">Name</h4>
-            <p className="text-sm text-muted-foreground">{server?.name}</p>
-          </div>
-          <div>
-            <h4 className="mb-2 text-sm font-medium">Description</h4>
-            <p className="text-sm text-muted-foreground">
-              {server?.description || 'No description'}
-            </p>
-          </div>
-          <Button onClick={() => setEditOpen(true)}>Edit Server</Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="details" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Server Details</CardTitle>
+              <CardDescription>Manage your server information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="mb-2 text-sm font-medium">Name</h4>
+                <p className="text-sm text-muted-foreground">{server?.name}</p>
+              </div>
+              <div>
+                <h4 className="mb-2 text-sm font-medium">Description</h4>
+                <p className="text-sm text-muted-foreground">
+                  {server?.description || 'No description'}
+                </p>
+              </div>
+              <Button onClick={() => setEditOpen(true)}>Edit Server</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>API Keys</CardTitle>
-              <CardDescription>Manage API keys for this server</CardDescription>
-            </div>
-            <Button onClick={handleCreateApiKey} disabled={isCreating}>
-              <Plus className="mr-2 h-4 w-4" />
-              {isCreating ? 'Creating...' : 'Create Key'}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {showNewKey && createdApiKey && (
-            <Card className="mb-4 border-primary">
-              <CardHeader>
-                <CardTitle className="text-sm">New API Key Created</CardTitle>
-                <CardDescription>
-                  Make sure to copy your API key now. You won&apos;t be able to see it again!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 rounded bg-muted p-2 font-mono text-sm">
-                    {createdApiKey}
-                  </code>
-                  <CopyButton value={createdApiKey} />
+        <TabsContent value="api-keys" className="mt-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>API Keys</CardTitle>
+                  <CardDescription>Manage API keys for this server</CardDescription>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-          <DataTable columns={columns} data={apiKeys || []} emptyMessage="No API keys yet" />
-        </CardContent>
-      </Card>
+                <Button onClick={handleCreateApiKey} disabled={isCreating}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {isCreating ? 'Creating...' : 'Create Key'}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {showNewKey && createdApiKey && (
+                <Card className="mb-4 border-primary">
+                  <CardHeader>
+                    <CardTitle className="text-sm">New API Key Created</CardTitle>
+                    <CardDescription>
+                      Make sure to copy your API key now. You won&apos;t be able to see it again!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded bg-muted p-2 font-mono text-sm">
+                        {createdApiKey}
+                      </code>
+                      <CopyButton value={createdApiKey} />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              <DataTable columns={columns} data={apiKeys || []} emptyMessage="No API keys yet" />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      <Card className="border-destructive">
-        <CardHeader>
-          <CardTitle className="text-destructive">Danger Zone</CardTitle>
-          <CardDescription>Irreversible and destructive actions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
-            Delete Server
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="danger" className="mt-4">
+          <Card className="border-destructive">
+            <CardHeader>
+              <CardTitle className="text-destructive">Danger Zone</CardTitle>
+              <CardDescription>Irreversible and destructive actions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="destructive" onClick={() => setDeleteOpen(true)}>
+                Delete Server
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {server && (
         <>

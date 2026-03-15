@@ -340,5 +340,71 @@
     "text": "Test all fire extinguishers",
     "completed": false,
     "createdAt": "2025-12-18T12:31:22.360Z"
+  },
+  {
+    "id": "a81eb44a-11ab-4568-b8b7-8417e4c82270",
+    "text": "Review MCP server integration",
+    "completed": true,
+    "createdAt": "2026-03-15T17:07:56.312Z"
+  },
+  {
+    "id": "629a062a-d135-493c-843e-4e6a833b2776",
+    "text": "Add metrics dashboard tests",
+    "completed": true,
+    "createdAt": "2026-03-15T17:07:57.602Z"
+  },
+  {
+    "id": "29c98415-6c5a-4b2b-8858-6a062e82b275",
+    "text": "Update SDK validator docs",
+    "completed": false,
+    "createdAt": "2026-03-15T17:08:00.256Z"
+  },
+  {
+    "id": "bf17e290-92ea-4cbb-a486-414046002052",
+    "text": "Fix linter warnings in no-data-found component",
+    "completed": false,
+    "createdAt": "2026-03-15T17:10:07.559Z"
+  },
+  {
+    "id": "a5cff971-5b78-4058-98ed-a9e6c48fe3a1",
+    "text": "Configure demo env for production",
+    "completed": false,
+    "createdAt": "2026-03-15T17:10:09.053Z"
+  },
+  {
+    "id": "5dcffb4c-cbab-47cd-a0eb-b79fdc164bc5",
+    "text": "Add error boundaries to metrics page",
+    "completed": true,
+    "createdAt": "2026-03-15T17:10:09.882Z"
+  },
+  {
+    "id": "b3db2d97-b0f0-45e7-a554-a752171b2269",
+    "text": "Implement server health check endpoint",
+    "completed": true,
+    "createdAt": "2026-03-15T17:10:11.373Z"
+  },
+  {
+    "id": "855145a1-f292-4d50-8cff-d8452973b050",
+    "text": "Refactor todo-mcp-server types",
+    "completed": true,
+    "createdAt": "2026-03-15T17:10:12.227Z"
+  },
+  {
+    "id": "66f75ce0-4a9e-46a1-8eeb-449d5b393b8a",
+    "text": "Operation 1: New task A",
+    "completed": false,
+    "createdAt": "2026-03-15T17:12:44.396Z"
+  },
+  {
+    "id": "0f34e983-efcf-463d-9bf3-1cf74249aa5e",
+    "text": "Operation 2: New task B",
+    "completed": false,
+    "createdAt": "2026-03-15T17:12:46.106Z"
+  },
+  {
+    "id": "38e3333e-41d7-4454-b9cf-eded5f11d807",
+    "text": "Operation 3: New task C",
+    "completed": false,
+    "createdAt": "2026-03-15T17:12:46.901Z"
   }
 ]
