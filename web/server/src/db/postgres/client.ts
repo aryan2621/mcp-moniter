@@ -1,22 +1,15 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { getEnv } from "../../config/env";
-import * as schema from "./schema.js";
+import type { Env } from "../../config/env";
+import * as schema from "./schema";
 
-let dbInstance: ReturnType<typeof drizzle<typeof schema>> | null = null;
+export type Db = ReturnType<typeof createDb>;
 
-function initDb() {
-    if (!dbInstance) {
-        const env = getEnv();
-        const client = postgres(env.POSTGRES_URL);
-        dbInstance = drizzle(client, { schema });
-    }
-    return dbInstance;
+/**
+ * Creates a request-scoped Drizzle DB instance. Must be called per request
+ * on Cloudflare Workers (I/O cannot be shared across requests).
+ */
+export function createDb(env: Env) {
+    const client = postgres(env.POSTGRES_URL);
+    return drizzle(client, { schema });
 }
-
-export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
-    get(_, prop) {
-        const instance = initDb();
-        return instance[prop as keyof typeof instance];
-    },
-});

@@ -1,10 +1,9 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { db } from "../db/postgres/client";
 import { servers } from "../db/postgres/schema";
 import { clerkAuth } from "../middleware/clerk-auth";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const serversRouter = new Hono<AppEnv>();
@@ -22,17 +21,27 @@ const updateServerSchema = z.object({
 });
 
 serversRouter.get("/", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
 
-    const userServers = await db.query.servers.findMany({
-        where: eq(servers.clerkUserId, user.id),
-        orderBy: (servers, { desc }) => [desc(servers.createdAt)],
-    });
+    const userServers = await db.execute<{
+        id: string;
+        clerkUserId: string;
+        name: string;
+        description: string | null;
+        createdAt: Date;
+    }>(
+        sql`SELECT id, clerk_user_id AS "clerkUserId", name, description, created_at AS "createdAt"
+            FROM servers
+            WHERE clerk_user_id = ${user.id}
+            ORDER BY created_at DESC`
+    );
 
     return c.json(userServers);
 });
 
 serversRouter.post("/", zValidator("json", createServerSchema), async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const { name, description } = c.req.valid("json");
 
@@ -49,6 +58,7 @@ serversRouter.post("/", zValidator("json", createServerSchema), async (c) => {
 });
 
 serversRouter.get("/:id", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("id");
 
@@ -67,6 +77,7 @@ serversRouter.patch(
     "/:id",
     zValidator("json", updateServerSchema),
     async (c) => {
+        const db = c.get("db");
         const user = c.get("user") as User;
         const serverId = c.req.param("id");
         const updates = c.req.valid("json");
@@ -90,6 +101,7 @@ serversRouter.patch(
 );
 
 serversRouter.delete("/:id", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("id");
 

@@ -1,5 +1,11 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME!
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!
+
+const isProd =
+  process.env.NODE_ENV === 'production' ||
+  process.env.ENVIRONMENT === 'production'
+export const API_BASE_URL = isProd
+  ? (process.env.NEXT_PUBLIC_API_BASE_URL ?? '')
+  : (process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL ?? 'http://localhost:8000')
 
 export const QUERY_KEYS = {
   SERVERS: ['servers'],

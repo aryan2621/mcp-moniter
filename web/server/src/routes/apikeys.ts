@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { db } from "../db/postgres/client";
 import { apiKeys, servers } from "../db/postgres/schema";
 import { clerkAuth } from "../middleware/clerk-auth";
 import { generateApiKey, hashApiKey } from "../services/apikey.service";
@@ -17,6 +16,7 @@ const createApiKeySchema = z.object({
 });
 
 apiKeysRouter.get("/servers/:serverId/keys", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
 
@@ -50,6 +50,7 @@ apiKeysRouter.post(
     "/servers/:serverId/keys",
     zValidator("json", createApiKeySchema),
     async (c) => {
+        const db = c.get("db");
         const user = c.get("user") as User;
         const serverId = c.req.param("serverId");
         const { name } = c.req.valid("json");
@@ -91,6 +92,7 @@ apiKeysRouter.post(
 );
 
 apiKeysRouter.delete("/keys/:id", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const keyId = c.req.param("id");
 

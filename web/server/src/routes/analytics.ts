@@ -7,16 +7,19 @@ import {
     getErrorAnalytics,
     getGlobalOverviewStats,
 } from "../services/metrics.service";
-import { db } from "../db/postgres/client";
 import { servers, apiKeys } from "../db/postgres/schema";
-import { eq, and, inArray, count } from "drizzle-orm";
+import { eq, and, inArray, count, sql } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const analyticsRouter = new Hono<AppEnv>();
 
 analyticsRouter.use("*", clerkAuth);
 
-async function validateServerAccess(c: any, serverId: string, userId: string) {
+async function validateServerAccess(
+    db: AppEnv["Variables"]["db"],
+    serverId: string,
+    userId: string
+) {
     const server = await db.query.servers.findFirst({
         where: and(eq(servers.id, serverId), eq(servers.clerkUserId, userId)),
     });
@@ -28,14 +31,13 @@ async function validateServerAccess(c: any, serverId: string, userId: string) {
 }
 
 analyticsRouter.get("/overview", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
 
-    const userServers = await db.query.servers.findMany({
-        where: eq(servers.clerkUserId, user.id),
-        columns: { id: true },
-    });
-
-    const serverIds = userServers.map((s) => s.id);
+    const rows = await db.execute<{ id: string }>(
+        sql`SELECT id FROM servers WHERE clerk_user_id = ${user.id}`
+    );
+    const serverIds = rows.map((r) => r.id);
 
     if (serverIds.length === 0) {
         return c.json({
@@ -62,11 +64,12 @@ analyticsRouter.get("/overview", async (c) => {
 });
 
 analyticsRouter.get("/servers/:serverId/overview", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
     const { startDate, endDate } = c.req.query();
 
-    if (!(await validateServerAccess(c, serverId, user.id))) {
+    if (!(await validateServerAccess(db, serverId, user.id))) {
         return c.json({ error: "Server not found" }, 404);
     }
 
@@ -80,11 +83,12 @@ analyticsRouter.get("/servers/:serverId/overview", async (c) => {
 });
 
 analyticsRouter.get("/servers/:serverId/performance", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
     const { startDate, endDate } = c.req.query();
 
-    if (!(await validateServerAccess(c, serverId, user.id))) {
+    if (!(await validateServerAccess(db, serverId, user.id))) {
         return c.json({ error: "Server not found" }, 404);
     }
 
@@ -98,11 +102,12 @@ analyticsRouter.get("/servers/:serverId/performance", async (c) => {
 });
 
 analyticsRouter.get("/servers/:serverId/tools", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
     const { startDate, endDate } = c.req.query();
 
-    if (!(await validateServerAccess(c, serverId, user.id))) {
+    if (!(await validateServerAccess(db, serverId, user.id))) {
         return c.json({ error: "Server not found" }, 404);
     }
 
@@ -116,11 +121,12 @@ analyticsRouter.get("/servers/:serverId/tools", async (c) => {
 });
 
 analyticsRouter.get("/servers/:serverId/errors", async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
     const { startDate, endDate } = c.req.query();
 
-    if (!(await validateServerAccess(c, serverId, user.id))) {
+    if (!(await validateServerAccess(db, serverId, user.id))) {
         return c.json({ error: "Server not found" }, 404);
     }
 

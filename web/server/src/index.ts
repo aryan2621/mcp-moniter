@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { validateEnv } from "./config/env";
+import { validateEnv, getEnv } from "./config/env";
+import { createDb } from "./db/postgres/client";
 import { Logger } from "./utils/logger";
 import type { AppEnv } from "./types/index";
 import { requestId } from "./middleware/request-id";
@@ -29,6 +30,11 @@ app.use("*", async (c, next) => {
 
 app.use("*", requestId);
 app.use("*", errorHandler);
+app.use("*", async (c, next) => {
+    const env = getEnv((c.env as Record<string, unknown>) ?? undefined);
+    c.set("db", createDb(env));
+    await next();
+});
 app.use(
     "*",
     cors({

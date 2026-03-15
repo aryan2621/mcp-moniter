@@ -8,7 +8,7 @@ export interface User {
 
 export interface Server {
     id: string;
-    userId: string;
+    clerkUserId: string;
     name: string;
     description: string | null;
     createdAt: Date;
@@ -36,10 +36,15 @@ export interface ToolCallEvent {
     errorStack?: string;
 }
 
+import type { Db } from "../db/postgres/client";
+
+export type { Db };
+
 export interface AppEnv {
     Variables: {
         user: User;
         server: Server;
         requestId: string;
+        db: Db;
     };
 }

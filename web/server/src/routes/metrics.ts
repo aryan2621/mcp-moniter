@@ -7,7 +7,6 @@ import {
     insertMetrics,
     getMetricsForServer,
 } from "../services/metrics.service";
-import { db } from "../db/postgres/client";
 import { servers } from "../db/postgres/schema";
 import { eq, and } from "drizzle-orm";
 import type { Server, User, AppEnv } from "../types/index";
@@ -58,6 +57,7 @@ const queryParamsSchema = z.object({
 });
 
 metricsRouter.get("/servers/:serverId", clerkAuth, async (c) => {
+    const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
 

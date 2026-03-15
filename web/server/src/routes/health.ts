@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import { sql } from "drizzle-orm";
-import { db } from "../db/postgres/client";
 import { getQueryApi } from "../db/influx/client";
 import { Logger } from "../utils/logger";
+import type { AppEnv } from "../types/index";
 
-const healthRouter = new Hono();
+const healthRouter = new Hono<AppEnv>();
 const logger = new Logger("Health");
 
-async function checkPostgres(): Promise<boolean> {
+async function checkPostgres(db: AppEnv["Variables"]["db"]): Promise<boolean> {
     try {
         await db.execute(sql`SELECT 1`);
         return true;
@@ -31,9 +31,10 @@ async function checkInfluxDB(): Promise<boolean> {
 
 healthRouter.get("/", async (c) => {
     const startTime = Date.now();
+    const db = c.get("db");
 
     const [postgresHealthy, influxHealthy] = await Promise.all([
-        checkPostgres(),
+        checkPostgres(db),
         checkInfluxDB(),
     ]);
 
