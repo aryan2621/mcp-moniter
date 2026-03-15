@@ -71,13 +71,12 @@ export class Logger {
             process.env?.NODE_ENV === "development";
 
         if (isDevelopment) {
-            // Formatted output for development
             const timestamp = new Date().toLocaleTimeString();
             const levelColors: Record<string, string> = {
-                DEBUG: "\x1b[36m", // Cyan
-                INFO: "\x1b[32m", // Green
-                WARN: "\x1b[33m", // Yellow
-                ERROR: "\x1b[31m", // Red
+                DEBUG: "\x1b[36m",
+                INFO: "\x1b[32m",
+                WARN: "\x1b[33m",
+                ERROR: "\x1b[31m",
             };
             const reset = "\x1b[0m";
             const levelColor = levelColors[LogLevel[level]] || "";
@@ -96,7 +95,6 @@ export class Logger {
                 console.log(output);
             }
         } else {
-            // JSON output for production
             const output = JSON.stringify(entry);
 
             if (level === LogLevel.ERROR) {

@@ -20,7 +20,6 @@ async function checkPostgres(db: AppEnv["Variables"]["db"]): Promise<boolean> {
 async function checkInfluxDB(): Promise<boolean> {
     try {
         const queryApi = getQueryApi();
-        // A simple query to check if we can reach InfluxDB and parse rows.
         await queryApi.collectRows('buckets() |> limit(n: 1)');
         return true;
     } catch (error) {

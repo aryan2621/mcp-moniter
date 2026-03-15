@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { apiKeyAuth } from "../middleware/auth-apikey";
 import { clerkAuth } from "../middleware/clerk-auth";
+import { rateLimit } from "../middleware/rate-limit";
 import {
     insertMetrics,
     getMetricsForServer,
@@ -30,6 +31,7 @@ const metricsArraySchema = z.array(toolCallEventSchema);
 metricsRouter.post(
     "",
     apiKeyAuth,
+    rateLimit,
     zValidator("json", metricsArraySchema),
     async (c) => {
         const server = c.get("server") as Server;
@@ -57,7 +59,7 @@ const queryParamsSchema = z.object({
     limit: z.string().optional(),
 });
 
-metricsRouter.get("/servers/:serverId", clerkAuth, zValidator("query", queryParamsSchema), async (c) => {
+metricsRouter.get("/servers/:serverId", clerkAuth, rateLimit, zValidator("query", queryParamsSchema), async (c) => {
     const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");

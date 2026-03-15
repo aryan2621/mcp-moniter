@@ -3,6 +3,15 @@ compatibility_date = "2024-03-14"
 compatibility_flags = ["nodejs_compat"]
 main = "src/index.ts"
 
+# Rate limit: 300 requests per 60s per key (per user or per server for API key).
+# Requires Wrangler 4.36+. Key is set in middleware from user id or API key server id.
+[[ratelimits]]
+name = "API_RATE_LIMITER"
+namespace_id = "1001"
+[ratelimits.simple]
+limit = 300
+period = 60
+
 # Non-secret env (secrets: POSTGRES_URL, INFLUX_TOKEN, CLERK_SECRET_KEY via `wrangler secret put`)
 [vars]
 INFLUX_URL = "https://us-east-1-1.aws.cloud2.influxdata.com"

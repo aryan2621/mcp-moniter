@@ -40,7 +40,15 @@ import type { Db } from "../db/postgres/client";
 
 export type { Db };
 
+/** Cloudflare Rate Limit binding (Wrangler 4.36+). See https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/ */
+export interface RateLimitBinding {
+    limit(options: { key: string }): Promise<{ success: boolean }>;
+}
+
 export interface AppEnv {
+    Bindings?: {
+        API_RATE_LIMITER?: RateLimitBinding;
+    };
     Variables: {
         user: User;
         server: Server;

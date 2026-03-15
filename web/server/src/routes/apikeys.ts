@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { apiKeys, servers } from "../db/postgres/schema";
 import { clerkAuth } from "../middleware/clerk-auth";
+import { rateLimit } from "../middleware/rate-limit";
 import { generateApiKey, hashApiKey } from "../services/apikey.service";
 import { eq, and } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
@@ -10,6 +11,7 @@ import type { User, AppEnv } from "../types/index";
 const apiKeysRouter = new Hono<AppEnv>();
 
 apiKeysRouter.use("*", clerkAuth);
+apiKeysRouter.use("*", rateLimit);
 
 const createApiKeySchema = z.object({
     name: z.string().min(1).max(255).optional(),

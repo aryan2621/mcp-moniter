@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { clerkAuth } from "../middleware/clerk-auth";
+import { rateLimit } from "../middleware/rate-limit";
 import {
     getOverviewStats,
     getPerformanceMetrics,
@@ -14,6 +15,7 @@ import type { User, AppEnv } from "../types/index";
 const analyticsRouter = new Hono<AppEnv>();
 
 analyticsRouter.use("*", clerkAuth);
+analyticsRouter.use("*", rateLimit);
 
 async function validateServerAccess(
     db: AppEnv["Variables"]["db"],

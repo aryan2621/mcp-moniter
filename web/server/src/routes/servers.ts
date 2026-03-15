@@ -3,12 +3,14 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { servers } from "../db/postgres/schema";
 import { clerkAuth } from "../middleware/clerk-auth";
+import { rateLimit } from "../middleware/rate-limit";
 import { eq, and, desc, sql } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const serversRouter = new Hono<AppEnv>();
 
 serversRouter.use("*", clerkAuth);
+serversRouter.use("*", rateLimit);
 
 const createServerSchema = z.object({
     name: z.string().min(1).max(255),

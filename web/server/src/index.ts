@@ -15,8 +15,6 @@ let envValidatedLogged = false;
 const app = new Hono<AppEnv>();
 
 app.use("*", async (c, next) => {
-    // Validate environment variables on the first request if they haven't been validated yet
-    // Cloudflare Workers pass environment variables inside `c.env`
     const env = validateEnv(
         (c.env as Record<string, unknown>) ??
         (typeof process !== "undefined" ? process.env : undefined)
@@ -38,7 +36,7 @@ app.use("*", async (c, next) => {
 app.use(
     "*",
     cors({
-        origin: (origin) => origin, // In production, replace with proper allowed origins from env
+        origin: (origin) => origin,
         credentials: true,
         allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowHeaders: ["Content-Type", "Authorization"],

@@ -23,7 +23,7 @@ export default function ServerMetricsPage({ params }: { params: Promise<{ id: st
 
   const handleFilter = (newFilters: FiltersType) => {
     setFilters(newFilters)
-    setPage(1) // Reset to first page when filters change
+    setPage(1)
   }
 
   const handleExport = () => {
