@@ -1,7 +1,7 @@
 'use client'
 
+import { useUser } from '@clerk/nextjs'
 import { useServers } from '@/hooks/use-servers'
-import { useAuth } from '@/hooks/use-auth'
 import { useGlobalOverview } from '@/hooks/use-analytics'
 import { StatsCard } from '@/components/dashboard/stats-cards'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
@@ -10,12 +10,12 @@ import { Server, Key, Activity, AlertCircle } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user } = useUser()
   const { servers, isLoading: serversLoading } = useServers()
   const { overview: globalOverview, isLoading: overviewLoading } = useGlobalOverview()
 
   const stats = {
-    totalServers: globalOverview?.totalServers ?? (servers?.length || 0),
+    totalServers: globalOverview?.totalServers ?? (Array.isArray(servers) ? servers.length : 0),
     totalApiKeys: globalOverview?.totalApiKeys || 0,
     totalMetrics: globalOverview?.totalMetrics || 0,
     errorRate: globalOverview?.errorRate ? (globalOverview.errorRate * 100).toFixed(2) : 0,
@@ -27,7 +27,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back{user?.name ? `, ${user.name}` : ''}
+          Welcome back{user?.firstName || user?.username ? `, ${user?.firstName || user?.username}` : ''}
         </h2>
         <p className="text-muted-foreground">
           Here&apos;s an overview of your MCP servers and metrics

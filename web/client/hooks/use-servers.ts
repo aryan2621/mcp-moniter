@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { serversApi } from '@/lib/api/endpoints/servers'
+import { useServersApi } from '@/lib/api/endpoints/servers'
 import { QUERY_KEYS } from '@/lib/constants'
 import type { CreateServerInput } from '@/lib/validators'
-import { useRouter } from 'next/navigation'
 
 export function useServers() {
   const queryClient = useQueryClient()
+  const serversApi = useServersApi()
 
   const {
     data: servers,
@@ -53,6 +53,8 @@ export function useServers() {
 }
 
 export function useServer(id: string) {
+  const serversApi = useServersApi()
+
   const {
     data: server,
     isLoading,

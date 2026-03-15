@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "node --import tsx src/index.ts",
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy src/index.ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
@@ -13,22 +13,20 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@hono/node-server": "^1.0.0",
+    "@clerk/backend": "^3.2.0",
     "@hono/zod-validator": "^0.2.0",
-    "bcrypt": "^5.1.0",
+    "@influxdata/influxdb-client": "^1.35.0",
     "drizzle-orm": "^0.30.0",
     "hono": "^4.0.0",
-    "jose": "^5.2.0",
-    "mongodb": "^6.0.0",
     "postgres": "^3.4.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
+    "@cloudflare/workers-types": "^4.20260313.1",
     "@types/node": "^20.0.0",
     "drizzle-kit": "^0.20.0",
     "prettier": "^3.0.0",
-    "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "wrangler": "^4.73.0"
   }
 }

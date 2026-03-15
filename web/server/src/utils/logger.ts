@@ -66,8 +66,9 @@ export class Logger {
             ...meta,
         };
 
-        // Use process.env directly to avoid circular dependency
-        const isDevelopment = process.env.NODE_ENV === "development";
+        const isDevelopment =
+            typeof process !== "undefined" &&
+            process.env?.NODE_ENV === "development";
 
         if (isDevelopment) {
             // Formatted output for development

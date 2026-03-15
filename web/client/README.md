@@ -1,15 +1,27 @@
 # client
 
-To install dependencies:
+Next.js app (dashboard, servers, metrics, API keys). Uses Clerk for auth and NPM for tooling.
+
+**Install dependencies:**
 
 ```bash
-bun install
+npm install
 ```
 
-To run:
+**Develop:**
 
 ```bash
-bun run index.ts
+npm run dev
 ```
 
-This project was created using `bun init` in bun v1.3.4. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+**Build:**
+
+```bash
+npm run build
+```
+
+**Start (production):**
+
+```bash
+npm run start
+```

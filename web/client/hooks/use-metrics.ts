@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { metricsApi } from '@/lib/api/endpoints/metrics'
+import { useMetricsApi } from '@/lib/api/endpoints/metrics'
 import { QUERY_KEYS } from '@/lib/constants'
 import type { MetricsFilters } from '@/lib/validators'
 
 export function useMetrics(serverId: string, filters?: MetricsFilters) {
+  const metricsApi = useMetricsApi()
+
   const {
     data,
     isLoading,

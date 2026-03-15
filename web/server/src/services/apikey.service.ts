@@ -1,12 +1,14 @@
-import { randomBytes, createHash } from "crypto";
-
 export function generateApiKey(): string {
-    const keyBytes = randomBytes(32);
-    return keyBytes.toString("hex");
+    const keyBytes = crypto.getRandomValues(new Uint8Array(32));
+    return Array.from(keyBytes).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function hashApiKey(apiKey: string): string {
-    return createHash("sha256").update(apiKey).digest("hex");
+export async function hashApiKey(apiKey: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(apiKey);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 export function validateApiKeyFormat(apiKey: string): boolean {

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { jwtAuth } from "../middleware/auth-jwt";
+import { clerkAuth } from "../middleware/clerk-auth";
 import {
     getOverviewStats,
     getPerformanceMetrics,
@@ -14,11 +14,11 @@ import type { User, AppEnv } from "../types/index";
 
 const analyticsRouter = new Hono<AppEnv>();
 
-analyticsRouter.use("*", jwtAuth);
+analyticsRouter.use("*", clerkAuth);
 
 async function validateServerAccess(c: any, serverId: string, userId: string) {
     const server = await db.query.servers.findFirst({
-        where: and(eq(servers.id, serverId), eq(servers.userId, userId)),
+        where: and(eq(servers.id, serverId), eq(servers.clerkUserId, userId)),
     });
 
     if (!server) {
@@ -31,7 +31,7 @@ analyticsRouter.get("/overview", async (c) => {
     const user = c.get("user") as User;
 
     const userServers = await db.query.servers.findMany({
-        where: eq(servers.userId, user.id),
+        where: eq(servers.clerkUserId, user.id),
         columns: { id: true },
     });
 

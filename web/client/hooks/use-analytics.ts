@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { analyticsApi } from '@/lib/api/endpoints/analytics'
+import { useAnalyticsApi } from '@/lib/api/endpoints/analytics'
 import { QUERY_KEYS } from '@/lib/constants'
 
 interface AnalyticsFilters {
@@ -8,6 +8,7 @@ interface AnalyticsFilters {
 }
 
 export function useOverview(serverId: string, filters?: AnalyticsFilters) {
+  const analyticsApi = useAnalyticsApi()
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.ANALYTICS(serverId, 'overview', filters),
     queryFn: () => analyticsApi.getOverview(serverId, filters),
@@ -18,6 +19,7 @@ export function useOverview(serverId: string, filters?: AnalyticsFilters) {
 }
 
 export function usePerformance(serverId: string, filters?: AnalyticsFilters) {
+  const analyticsApi = useAnalyticsApi()
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.ANALYTICS(serverId, 'performance', filters),
     queryFn: () => analyticsApi.getPerformance(serverId, filters),
@@ -28,6 +30,7 @@ export function usePerformance(serverId: string, filters?: AnalyticsFilters) {
 }
 
 export function useToolUsage(serverId: string, filters?: AnalyticsFilters) {
+  const analyticsApi = useAnalyticsApi()
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.ANALYTICS(serverId, 'tools', filters),
     queryFn: () => analyticsApi.getToolUsage(serverId, filters),
@@ -38,6 +41,7 @@ export function useToolUsage(serverId: string, filters?: AnalyticsFilters) {
 }
 
 export function useErrorAnalytics(serverId: string, filters?: AnalyticsFilters) {
+  const analyticsApi = useAnalyticsApi()
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.ANALYTICS(serverId, 'errors', filters),
     queryFn: () => analyticsApi.getErrors(serverId, filters),
@@ -48,6 +52,7 @@ export function useErrorAnalytics(serverId: string, filters?: AnalyticsFilters) 
 }
 
 export function useGlobalOverview() {
+  const analyticsApi = useAnalyticsApi()
   const { data, isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.GLOBAL_ANALYTICS,
     queryFn: () => analyticsApi.getGlobalOverview(),

@@ -1,10 +1,9 @@
-import type { Context } from "hono";
-
 export interface User {
     id: string;
     email: string;
     name: string | null;
-    createdAt: Date;
+    imageUrl?: string | null;
+    createdAt?: Date;
 }
 
 export interface Server {
@@ -23,16 +22,6 @@ export interface ApiKey {
     lastUsedAt: Date | null;
     createdAt: Date;
     revokedAt: Date | null;
-}
-
-export interface JwtPayload {
-    userId: string;
-    email: string;
-}
-
-export interface AuthContext extends Context {
-    user?: User;
-    server?: Server;
 }
 
 export interface ToolCallEvent {

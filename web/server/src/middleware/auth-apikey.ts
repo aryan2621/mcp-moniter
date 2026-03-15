@@ -18,7 +18,7 @@ export async function apiKeyAuth(c: Context, next: Next) {
         return c.json({ error: "Invalid API key format" }, 401);
     }
 
-    const keyHash = hashApiKey(apiKey);
+    const keyHash = await hashApiKey(apiKey);
 
     const apiKeyRecord = await db.query.apiKeys.findFirst({
         where: and(eq(apiKeys.keyHash, keyHash), isNull(apiKeys.revokedAt)),
@@ -42,7 +42,6 @@ export async function apiKeyAuth(c: Context, next: Next) {
         .where(eq(apiKeys.id, apiKeyRecord.id));
 
     c.set("server", server);
-    c.set("apiKeyId", apiKeyRecord.id);
 
     await next();
 }

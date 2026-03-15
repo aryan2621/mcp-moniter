@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { apiKeysApi } from '@/lib/api/endpoints/apikeys'
+import { useApiKeysApi } from '@/lib/api/endpoints/apikeys'
 import { QUERY_KEYS } from '@/lib/constants'
 import type { CreateApiKeyInput } from '@/lib/validators'
 
 export function useApiKeys(serverId: string) {
   const queryClient = useQueryClient()
+  const apiKeysApi = useApiKeysApi()
 
   const {
     data: apiKeys,

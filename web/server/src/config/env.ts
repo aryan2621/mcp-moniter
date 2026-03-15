@@ -2,29 +2,32 @@ import { z } from "zod";
 
 const EnvSchema = z.object({
     POSTGRES_URL: z.string().url(),
-    MONGO_URL: z.string().url(),
-    JWT_SECRET: z.string().min(32),
-    JWT_EXPIRY: z.string().default("7d"),
+    INFLUX_URL: z.string().url(),
+    INFLUX_TOKEN: z.string().min(1),
+    INFLUX_ORG: z.string().min(1),
+    INFLUX_BUCKET: z.string().min(1),
+    CLERK_SECRET_KEY: z.string().min(1),
+    CLERK_PUBLISHABLE_KEY: z.string().optional(),
     PORT: z.coerce.number().int().positive().default(8000),
     NODE_ENV: z
         .enum(["development", "production", "test"])
         .default("development"),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
-    RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
-    RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
-    FRONTEND_URL: z.string().url().default("http://localhost:3000"),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
 
 let cachedEnv: Env | null = null;
 
-export function validateEnv(): Env {
+export function validateEnv(inputEnv?: Record<string, any>): Env {
     if (cachedEnv) {
         return cachedEnv;
     }
 
-    const result = EnvSchema.safeParse(process.env);
+    const envSource =
+        inputEnv ??
+        (typeof process !== "undefined" ? process.env : undefined);
+    const result = EnvSchema.safeParse(envSource);
 
     if (!result.success) {
         const errorMessage = `Environment validation failed:\n${result.error.errors
@@ -37,9 +40,12 @@ export function validateEnv(): Env {
     return result.data;
 }
 
-export function getEnv(): Env {
-    if (!cachedEnv) {
-        throw new Error("Environment not validated. Call validateEnv() first");
+export function getEnv(env?: Record<string, any>): Env {
+    if (env) {
+        return validateEnv(env);
     }
-    return cachedEnv;
+    if (cachedEnv) {
+        return cachedEnv;
+    }
+    return validateEnv();
 }

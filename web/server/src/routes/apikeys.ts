@@ -3,14 +3,14 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { db } from "../db/postgres/client";
 import { apiKeys, servers } from "../db/postgres/schema";
-import { jwtAuth } from "../middleware/auth-jwt";
+import { clerkAuth } from "../middleware/clerk-auth";
 import { generateApiKey, hashApiKey } from "../services/apikey.service";
 import { eq, and, isNull } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const apiKeysRouter = new Hono<AppEnv>();
 
-apiKeysRouter.use("*", jwtAuth);
+apiKeysRouter.use("*", clerkAuth);
 
 const createApiKeySchema = z.object({
     name: z.string().min(1).max(255).optional(),
@@ -21,7 +21,7 @@ apiKeysRouter.get("/servers/:serverId/keys", async (c) => {
     const serverId = c.req.param("serverId");
 
     const server = await db.query.servers.findFirst({
-        where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+        where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
     });
 
     if (!server) {
@@ -55,7 +55,7 @@ apiKeysRouter.post(
         const { name } = c.req.valid("json");
 
         const server = await db.query.servers.findFirst({
-            where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+            where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
         });
 
         if (!server) {
@@ -63,7 +63,7 @@ apiKeysRouter.post(
         }
 
         const apiKey = generateApiKey();
-        const keyHash = hashApiKey(apiKey);
+        const keyHash = await hashApiKey(apiKey);
 
         const [newApiKey] = await db
             .insert(apiKeys)
@@ -105,7 +105,7 @@ apiKeysRouter.delete("/keys/:id", async (c) => {
         return c.json({ error: "API key not found" }, 404);
     }
 
-    if (apiKey.server.userId !== user.id) {
+    if (apiKey.server.clerkUserId !== user.id) {
         return c.json({ error: "Unauthorized" }, 403);
     }
 

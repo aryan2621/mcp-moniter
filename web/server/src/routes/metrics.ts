@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { apiKeyAuth } from "../middleware/auth-apikey";
-import { jwtAuth } from "../middleware/auth-jwt";
+import { clerkAuth } from "../middleware/clerk-auth";
 import {
     insertMetrics,
     getMetricsForServer,
@@ -57,12 +57,16 @@ const queryParamsSchema = z.object({
     limit: z.string().optional(),
 });
 
-metricsRouter.get("/servers/:serverId", jwtAuth, async (c) => {
+metricsRouter.get("/servers/:serverId", clerkAuth, async (c) => {
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
 
+    if (!serverId) {
+        return c.json({ error: "Server ID required" }, 400);
+    }
+
     const server = await db.query.servers.findFirst({
-        where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+        where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
     });
 
     if (!server) {

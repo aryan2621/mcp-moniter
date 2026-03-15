@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { sql } from "drizzle-orm";
 import { db } from "../db/postgres/client";
-import { getMongoDb } from "../db/mongodb/client";
+import { getQueryApi } from "../db/influx/client";
 import { Logger } from "../utils/logger";
 
 const healthRouter = new Hono();
@@ -17,13 +17,14 @@ async function checkPostgres(): Promise<boolean> {
     }
 }
 
-async function checkMongoDB(): Promise<boolean> {
+async function checkInfluxDB(): Promise<boolean> {
     try {
-        const mongoDb = getMongoDb();
-        await mongoDb.admin().ping();
+        const queryApi = getQueryApi();
+        // A simple query to check if we can reach InfluxDB and parse rows.
+        await queryApi.collectRows('buckets() |> limit(n: 1)');
         return true;
     } catch (error) {
-        logger.error("MongoDB health check failed", error as Error);
+        logger.error("InfluxDB health check failed", error as Error);
         return false;
     }
 }
@@ -31,13 +32,13 @@ async function checkMongoDB(): Promise<boolean> {
 healthRouter.get("/", async (c) => {
     const startTime = Date.now();
 
-    const [postgresHealthy, mongoHealthy] = await Promise.all([
+    const [postgresHealthy, influxHealthy] = await Promise.all([
         checkPostgres(),
-        checkMongoDB(),
+        checkInfluxDB(),
     ]);
 
     const responseTime = Date.now() - startTime;
-    const healthy = postgresHealthy && mongoHealthy;
+    const healthy = postgresHealthy && influxHealthy;
 
     return c.json(
         {
@@ -48,14 +49,12 @@ healthRouter.get("/", async (c) => {
                     healthy: postgresHealthy,
                     status: postgresHealthy ? "up" : "down",
                 },
-                mongodb: {
-                    healthy: mongoHealthy,
-                    status: mongoHealthy ? "up" : "down",
+                influxdb: {
+                    healthy: influxHealthy,
+                    status: influxHealthy ? "up" : "down",
                 },
             },
             system: {
-                uptime: process.uptime(),
-                memory: process.memoryUsage(),
                 responseTime,
             },
         },

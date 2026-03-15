@@ -3,13 +3,13 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { db } from "../db/postgres/client";
 import { servers } from "../db/postgres/schema";
-import { jwtAuth } from "../middleware/auth-jwt";
+import { clerkAuth } from "../middleware/clerk-auth";
 import { eq, and } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const serversRouter = new Hono<AppEnv>();
 
-serversRouter.use("*", jwtAuth);
+serversRouter.use("*", clerkAuth);
 
 const createServerSchema = z.object({
     name: z.string().min(1).max(255),
@@ -25,7 +25,7 @@ serversRouter.get("/", async (c) => {
     const user = c.get("user") as User;
 
     const userServers = await db.query.servers.findMany({
-        where: eq(servers.userId, user.id),
+        where: eq(servers.clerkUserId, user.id),
         orderBy: (servers, { desc }) => [desc(servers.createdAt)],
     });
 
@@ -39,7 +39,7 @@ serversRouter.post("/", zValidator("json", createServerSchema), async (c) => {
     const [newServer] = await db
         .insert(servers)
         .values({
-            userId: user.id,
+            clerkUserId: user.id,
             name,
             description: description || null,
         })
@@ -53,7 +53,7 @@ serversRouter.get("/:id", async (c) => {
     const serverId = c.req.param("id");
 
     const server = await db.query.servers.findFirst({
-        where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+        where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
     });
 
     if (!server) {
@@ -72,7 +72,7 @@ serversRouter.patch(
         const updates = c.req.valid("json");
 
         const server = await db.query.servers.findFirst({
-            where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+            where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
         });
 
         if (!server) {
@@ -94,7 +94,7 @@ serversRouter.delete("/:id", async (c) => {
     const serverId = c.req.param("id");
 
     const server = await db.query.servers.findFirst({
-        where: and(eq(servers.id, serverId), eq(servers.userId, user.id)),
+        where: and(eq(servers.id, serverId), eq(servers.clerkUserId, user.id)),
     });
 
     if (!server) {

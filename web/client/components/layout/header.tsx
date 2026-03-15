@@ -1,24 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, Moon, Sun, LogOut, User } from 'lucide-react'
+import { Menu, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { useUiStore } from '@/store/ui-store'
-import { useAuth } from '@/hooks/use-auth'
+import { UserButton } from '@clerk/nextjs'
 import { APP_NAME } from '@/lib/constants'
 
 export function Header() {
   const { theme, setTheme } = useTheme()
   const { toggleSidebar } = useUiStore()
-  const { user, logout } = useAuth()
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -44,26 +36,13 @@ export function Header() {
             <span className="sr-only">Toggle theme</span>
           </Button>
 
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <div className="flex items-center justify-start gap-2 p-2">
-                <div className="flex flex-col space-y-1 leading-none">
-                  {user?.name && <p className="font-medium">{user.name}</p>}
-                  <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8",
+              }
+            }}
+          />
         </div>
       </div>
     </header>
