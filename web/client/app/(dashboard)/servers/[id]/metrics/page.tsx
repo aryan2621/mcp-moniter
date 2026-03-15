@@ -11,7 +11,6 @@ import { MetricsFilters as FiltersType } from '@/lib/validators'
 
 export default function ServerMetricsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const { server } = useServer(id)
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState<FiltersType>({})
   const { metrics, pagination, isLoading } = useMetrics(id, { ...filters, page })
@@ -45,16 +44,20 @@ export default function ServerMetricsPage({ params }: { params: Promise<{ id: st
     a.click()
   }
 
+  const hasData = !isLoading && pagination && pagination.total > 0
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end pt-2">
-        <Button onClick={handleExport} disabled={!metrics || metrics.length === 0}>
-          <Download className="mr-2 h-4 w-4" />
-          Export CSV
-        </Button>
-      </div>
+      {hasData && (
+        <div className="flex justify-end pt-2">
+          <Button onClick={handleExport} disabled={!metrics || metrics.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+        </div>
+      )}
 
-      <MetricsFilters onFilter={handleFilter} />
+      {hasData && <MetricsFilters onFilter={handleFilter} />}
 
       <MetricsTable 
         metrics={metrics || []} 

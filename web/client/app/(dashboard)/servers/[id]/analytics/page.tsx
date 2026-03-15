@@ -3,12 +3,13 @@
 import { use, useState } from 'react'
 import { useServer } from '@/hooks/use-servers'
 import { useOverview, usePerformance, useToolUsage, useErrorAnalytics } from '@/hooks/use-analytics'
+import { useApiKeys } from '@/hooks/use-apikeys'
 import { PerformanceChart } from '@/components/analytics/performance-chart'
 import { ToolUsageChart } from '@/components/analytics/tool-usage-chart'
 import { ErrorRateChart } from '@/components/analytics/error-rate-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Activity, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { Activity, CheckCircle2, Clock, XCircle, Key } from 'lucide-react'
 import { formatDuration } from '@/lib/utils'
 
 export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -20,6 +21,9 @@ export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: 
   const { performance, isLoading: perfLoading } = usePerformance(id, filters)
   const { toolUsage, isLoading: toolsLoading } = useToolUsage(id, filters)
   const { errors, isLoading: errorsLoading } = useErrorAnalytics(id, filters)
+  const { apiKeys } = useApiKeys(id)
+
+  const activeApiKeysCount = apiKeys?.filter((k) => !k.revokedAt).length ?? 0
 
   const stats = [
     {
@@ -46,12 +50,18 @@ export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: 
       icon: XCircle,
       color: 'text-destructive',
     },
+    {
+      title: 'Active API Keys',
+      value: activeApiKeysCount,
+      icon: Key,
+      color: 'text-muted-foreground',
+    },
   ]
 
   return (
     <div className="space-y-4 pt-2">
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -67,19 +77,29 @@ export default function ServerAnalyticsPage({ params }: { params: Promise<{ id: 
         ))}
       </div>
 
-      {perfLoading ? (
-        <Skeleton className="h-[400px]" />
-      ) : (
-        <PerformanceChart data={performance || []} />
+      {overview?.totalCalls !== 0 && (
+        perfLoading ? (
+          <Skeleton className="h-[400px]" />
+        ) : (
+          <PerformanceChart data={performance || []} />
+        )
       )}
 
-      {toolsLoading ? (
-        <Skeleton className="h-[400px]" />
-      ) : (
-        <ToolUsageChart data={toolUsage || []} />
+      {overview?.totalCalls !== 0 && (
+        toolsLoading ? (
+          <Skeleton className="h-[400px]" />
+        ) : (
+          <ToolUsageChart data={toolUsage || []} />
+        )
       )}
 
-      {errorsLoading ? <Skeleton className="h-[400px]" /> : <ErrorRateChart data={errors || []} />}
+      {overview?.totalCalls !== 0 && (
+        errorsLoading ? (
+          <Skeleton className="h-[400px]" />
+        ) : (
+          <ErrorRateChart data={errors || []} />
+        )
+      )}
     </div>
   )
 }

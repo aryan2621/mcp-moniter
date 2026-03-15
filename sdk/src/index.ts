@@ -23,8 +23,6 @@ export {
   McpMonitorError,
   TransportError,
   ConfigurationError,
-  BufferOverflowError,
-  ValidationError,
   CircuitBreakerError,
 } from "./errors/index.js";
 

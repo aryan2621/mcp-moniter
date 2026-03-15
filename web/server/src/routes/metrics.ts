@@ -53,10 +53,11 @@ metricsRouter.post(
 const queryParamsSchema = z.object({
     startDate: z.string().optional(),
     endDate: z.string().optional(),
+    page: z.string().optional(),
     limit: z.string().optional(),
 });
 
-metricsRouter.get("/servers/:serverId", clerkAuth, async (c) => {
+metricsRouter.get("/servers/:serverId", clerkAuth, zValidator("query", queryParamsSchema), async (c) => {
     const db = c.get("db");
     const user = c.get("user") as User;
     const serverId = c.req.param("serverId");
@@ -73,7 +74,7 @@ metricsRouter.get("/servers/:serverId", clerkAuth, async (c) => {
         return c.json({ error: "Server not found" }, 404);
     }
 
-    const { startDate, endDate, page, limit } = c.req.query();
+    const { startDate, endDate, page, limit } = c.req.valid("query");
 
     const startDateObj = startDate ? new Date(startDate) : undefined;
     const endDateObj = endDate ? new Date(endDate) : undefined;

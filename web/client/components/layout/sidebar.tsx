@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Key, Activity, BarChart, Settings, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Server, Key, Activity, BarChart, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUiStore } from '@/store/ui-store'
 
@@ -16,8 +16,8 @@ export function Sidebar() {
   const serverId = serverMatch ? serverMatch[1] : null
 
   const isServerSubPage = (href: string) => {
-    if (href === `/servers/${serverId}`) {
-      return pathname === href
+    if (href === `/servers/${serverId}/analytics`) {
+      return pathname === href || pathname === `/servers/${serverId}`
     }
     return pathname.startsWith(href)
   }
@@ -36,9 +36,8 @@ export function Sidebar() {
   ]
 
   const serverSubRoutes = serverId ? [
-    { label: 'Overview', href: `/servers/${serverId}`, icon: ChevronRight },
-    { label: 'Metrics', href: `/servers/${serverId}/metrics`, icon: Activity },
     { label: 'Analytics', href: `/servers/${serverId}/analytics`, icon: BarChart },
+    { label: 'Metrics', href: `/servers/${serverId}/metrics`, icon: Activity },
     { label: 'Settings', href: `/servers/${serverId}/settings`, icon: Settings },
   ] : []
 

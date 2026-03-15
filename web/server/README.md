@@ -1,11 +1,11 @@
 # MCP Metrics Server
 
-A lightweight metrics collection server built with Hono and Bun.
+A lightweight metrics collection server built with Hono on Cloudflare Workers.
 
 ## Features
 
-- Fast Bun runtime
-- Minimal Hono framework
+- Cloudflare Workers runtime (Wrangler)
+- Hono framework
 - CORS enabled
 - Request logging
 - Health check endpoint
@@ -13,24 +13,24 @@ A lightweight metrics collection server built with Hono and Bun.
 ## Installation
 
 ```bash
-bun install
+npm install
 ```
 
 ## Usage
 
-### Development (with auto-reload)
+### Development
 
 ```bash
-bun run dev
+npm run dev
 ```
+
+Server runs on `http://localhost:8000`
 
 ### Production
 
 ```bash
-bun run start
+npm run deploy
 ```
-
-Server runs on `http://localhost:8000`
 
 ## Endpoints
 
@@ -42,9 +42,9 @@ Server info and available endpoints
 
 Health check endpoint
 
-### `POST /metrics`
+### `POST /v1/metrics`
 
-Receive metrics batch from MCP SDK
+Receive metrics batch from MCP SDK (requires `X-API-Key` header)
 
 **Request body:**
 
@@ -71,33 +71,6 @@ Receive metrics batch from MCP SDK
 }
 ```
 
-## Configuration
-
-Set port via environment variable:
-
-```bash
-PORT=8080 bun run start
-```
-
 ## Connect MCP SDK
 
-Update your MCP server to send metrics:
-
-```typescript
-import ky from "ky";
-
-const server = new MonitoredMcpServer(
-  { name: "todo-mcp", version: "0.1.0" },
-  undefined,
-  {
-    batchSize: 50,
-    onBatchReady: async (events) => {
-      await ky.post("http://localhost:8000/metrics", {
-        json: events,
-      });
-    },
-  }
-);
-```
-
-Install ky: `npm install ky` or `bun add ky`
+Update your MCP server to send metrics to `POST /v1/metrics` with `X-API-Key` header. Use the SDK's `metricsServerUrl` and `apiKey` options (e.g. `http://localhost:8000/v1/metrics`).

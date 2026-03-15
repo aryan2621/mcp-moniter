@@ -2,13 +2,9 @@
 
 import { use } from 'react'
 import { useServer } from '@/hooks/use-servers'
-import { useOverview } from '@/hooks/use-analytics'
-import { useApiKeys } from '@/hooks/use-apikeys'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate, formatDuration } from '../../../../lib/utils'
-import { Activity, Key, BarChart } from 'lucide-react'
+import { formatDate } from '../../../../lib/utils'
 
 export default function ServerLayout({
   children,

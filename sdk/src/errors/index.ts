@@ -34,20 +34,6 @@ export class ConfigurationError extends McpMonitorError {
   }
 }
 
-export class BufferOverflowError extends McpMonitorError {
-  constructor(message: string, context?: Record<string, unknown>) {
-    super(message, "BUFFER_OVERFLOW", context);
-    this.name = "BufferOverflowError";
-  }
-}
-
-export class ValidationError extends McpMonitorError {
-  constructor(message: string, context?: Record<string, unknown>) {
-    super(message, "VALIDATION_ERROR", context);
-    this.name = "ValidationError";
-  }
-}
-
 export class CircuitBreakerError extends McpMonitorError {
   constructor(message: string, context?: Record<string, unknown>) {
     super(message, "CIRCUIT_BREAKER_OPEN", context);

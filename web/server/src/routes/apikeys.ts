@@ -4,7 +4,7 @@ import { z } from "zod";
 import { apiKeys, servers } from "../db/postgres/schema";
 import { clerkAuth } from "../middleware/clerk-auth";
 import { generateApiKey, hashApiKey } from "../services/apikey.service";
-import { eq, and, isNull } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import type { User, AppEnv } from "../types/index";
 
 const apiKeysRouter = new Hono<AppEnv>();

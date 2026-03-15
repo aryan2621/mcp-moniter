@@ -15,8 +15,6 @@ export { Alert, AlertTitle, AlertDescription, alertVariants } from './alert'
 
 export { Skeleton } from './skeleton'
 
-export { Separator } from './separator'
-
 export {
   Dialog,
   DialogPortal,
@@ -31,24 +29,6 @@ export {
 } from './dialog'
 
 export {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
-} from './dropdown-menu'
-
-export {
   Select,
   SelectGroup,
   SelectValue,
@@ -59,8 +39,6 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 } from './select'
-
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
 
 export {
   Toast,
