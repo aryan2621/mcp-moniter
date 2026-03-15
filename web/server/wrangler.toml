@@ -3,10 +3,10 @@ compatibility_date = "2024-03-14"
 compatibility_flags = ["nodejs_compat"]
 main = "src/index.ts"
 
-# [vars]
-# INFLUX_URL = "https://your-influx-url"
-# INFLUX_TOKEN = "your-token"
-# INFLUX_ORG = "your-org"
-# INFLUX_BUCKET = "your-bucket"
-# CLERK_SECRET_KEY = "your-clerk-secret"
-# POSTGRES_URL = "postgres://user:pass@host/db"
+# Non-secret env (secrets: POSTGRES_URL, INFLUX_TOKEN, CLERK_SECRET_KEY via `wrangler secret put`)
+[vars]
+INFLUX_URL = "https://us-east-1-1.aws.cloud2.influxdata.com"
+INFLUX_ORG = "Dev Team"
+INFLUX_BUCKET = "mcp-metrics"
+NODE_ENV = "production"
+LOG_LEVEL = "info"
