@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+node_modules/
+.venv/
+.next/
+dist/
+out/
+*.tsbuildinfo
+package-lock.json

@@ -1,76 +1,39 @@
-# MCP Metrics Server
+# mcp-monitor-server
 
-A lightweight metrics collection server built with Hono on Cloudflare Workers.
-
-## Features
-
-- Cloudflare Workers runtime (Wrangler)
-- Hono framework
-- CORS enabled
-- Request logging
-- Health check endpoint
-
-## Installation
+Cloud metrics API. Hono on Cloudflare Workers. Postgres for servers and API keys; Influx for time-series. Clerk for dashboard users; `X-API-Key` for SDK ingest.
 
 ```bash
+cd cloud/web/server
 npm install
-```
-
-## Usage
-
-### Development
-
-```bash
 npm run dev
 ```
 
-Server runs on `http://localhost:8000`
-
-### Production
+Wrangler serves `http://localhost:8000`. Deploy:
 
 ```bash
 npm run deploy
 ```
 
+## Env
+
+Non-secrets in `wrangler.toml` `[vars]`. Put secrets with `wrangler secret put`:
+
+| Variable | Required | Notes |
+|---|---|---|
+| `POSTGRES_URL` | yes | |
+| `INFLUX_URL` | yes | |
+| `INFLUX_TOKEN` | yes | secret |
+| `INFLUX_ORG` | yes | |
+| `INFLUX_BUCKET` | yes | |
+| `CLERK_SECRET_KEY` | yes | secret |
+| `CLERK_PUBLISHABLE_KEY` | no | |
+| `LOG_LEVEL` | no | default `info` |
+
 ## Endpoints
 
-### `GET /`
+- `GET /` — service info
+- `GET /health`
+- `POST /v1/metrics` — SDK ingest (`X-API-Key`, JSON array of tool-call events, max 100)
+- `GET /v1/servers`, API keys, analytics — Clerk `Authorization`
 
-Server info and available endpoints
-
-### `GET /health`
-
-Health check endpoint
-
-### `POST /v1/metrics`
-
-Receive metrics batch from MCP SDK (requires `X-API-Key` header)
-
-**Request body:**
-
-```json
-[
-  {
-    "callId": "uuid",
-    "toolName": "todos_add",
-    "timestamp": "2025-12-14T18:50:10.885Z",
-    "duration": 15,
-    "inputSize": 31,
-    "outputSize": 243,
-    "success": true
-  }
-]
-```
-
-**Response:**
-
-```json
-{
-  "received": 1,
-  "timestamp": "2025-12-14T18:50:10.885Z"
-}
-```
-
-## Connect MCP SDK
-
-Update your MCP server to send metrics to `POST /v1/metrics` with `X-API-Key` header. Use the SDK's `metricsServerUrl` and `apiKey` options (e.g. `http://localhost:8000/v1/metrics`).
+Ingest body is a raw event array, not `{ serverName, events }`. The key maps to a server row. SDKs: [../../sdk](../../sdk).

@@ -1,0 +1,12 @@
+node_modules/
+.venv/
+dist/
+out/
+.next/
+target/
+*.tsbuildinfo
+.env
+.env.local
+todos.json
+attendance.json
+restaurant.json

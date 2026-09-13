@@ -1,27 +1,27 @@
-# client
+# mcp-monitor-ui
 
-Next.js app (dashboard, servers, metrics, API keys). Uses Clerk for auth and NPM for tooling.
-
-**Install dependencies:**
+Next.js dashboard for the cloud API. Auth is Clerk. Create a server and API key here; MCP SDKs ingest with `X-API-Key`.
 
 ```bash
+cd cloud/web/client
 npm install
-```
-
-**Develop:**
-
-```bash
 npm run dev
 ```
 
-**Build:**
+| Script | |
+|---|---|
+| `npm run dev` | Next.js |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run type-check` | `tsc --noEmit` |
 
-```bash
-npm run build
-```
+## Env
 
-**Start (production):**
+| Variable | Notes |
+|---|---|
+| Clerk keys | Required by `@clerk/nextjs` |
+| `NEXT_PUBLIC_LOCAL_API_BASE_URL` | Dev API, default `http://localhost:8000` |
+| `NEXT_PUBLIC_API_BASE_URL` | Production API |
+| `NEXT_PUBLIC_APP_NAME` | Optional; default `MCP Monitor` |
 
-```bash
-npm run start
-```
+The API in [../server](../server) must be running (or deployed) for servers, keys, metrics, and analytics.

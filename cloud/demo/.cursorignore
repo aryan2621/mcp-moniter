@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+node_modules/
+dist/
+package-lock.json
+todos.json
+metrics.json
+js/todos.json
+js/attendance.json
+python/restaurant.json

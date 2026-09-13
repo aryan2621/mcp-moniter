@@ -1,0 +1,13 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+todos.json
+attendance.json
+restaurant.json
+.DS_Store

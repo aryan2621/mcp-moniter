@@ -1,0 +1,21 @@
+{
+  "name": "mcp-monitor-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "todo-server": "tsx todo-mcp-server.ts",
+    "attendance-server": "tsx attendance-mcp-server.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "zod": "^4.0.0",
+    "@local/mcp-monitor-sdk": "file:../../sdk/js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

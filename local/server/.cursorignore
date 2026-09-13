@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+node_modules/
+dist/
+*.tsbuildinfo
+package-lock.json

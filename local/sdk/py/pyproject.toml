@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-monitor-sdk"
+version = "0.1.0"
+description = "Self-host monitoring SDK for Python MCP servers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "MCP Monitor" }]
+keywords = ["mcp", "model-context-protocol", "observability", "metrics"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Monitoring",
+]
+dependencies = [
+  "mcp>=1.2.0,<2",
+  "httpx>=0.27.0",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/mcp-monitor-sdk/"
+Repository = "https://pypi.org/project/mcp/"
+
+[project.optional-dependencies]
+dev = ["build", "twine"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_monitor_sdk"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/mcp_monitor_sdk", "README.md"]
