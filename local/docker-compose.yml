@@ -17,7 +17,7 @@ services:
       retries: 10
 
   api:
-    image: ghcr.io/mcp-monitor/server:${IMAGE_TAG:-0.1.0}
+    image: gintama2412/mcp-monitor-server:${IMAGE_TAG:-0.1.0}
     build:
       context: ./server
       dockerfile: Dockerfile

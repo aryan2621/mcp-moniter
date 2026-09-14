@@ -5,24 +5,53 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver without v prefix, e.g. 0.2.0"
+        required: true
+        type: string
 
 env:
-  IMAGE_NAME: ghcr.io/mcp-monitor/server
-  VERSION: 0.1.0
+  IMAGE_NAME: gintama2412/mcp-monitor-server
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            raw="$INPUT_VERSION"
+          else
+            raw="$REF_NAME"
+          fi
+          raw="${raw#v}"
+          if ! [[ "$raw" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid version: $raw" >&2
+            exit 1
+          fi
+          echo "version=$raw" >> "$GITHUB_OUTPUT"
+          echo "tag=v$raw" >> "$GITHUB_OUTPUT"
+
   server-image:
+    needs: prepare
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
         with:
@@ -30,10 +59,11 @@ jobs:
           file: local/server/Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.version }}
             ${{ env.IMAGE_NAME }}:latest
 
   desktop-installers:
+    needs: prepare
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +77,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Stamp release version
+        working-directory: local/app
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          node <<'EOF'
+          const fs = require("fs");
+          const version = process.env.RELEASE_VERSION;
+          const stamp = (path, mutate) => {
+            const data = JSON.parse(fs.readFileSync(path, "utf8"));
+            mutate(data);
+            fs.writeFileSync(path, JSON.stringify(data, null, 2) + "\n");
+          };
+          stamp("package.json", (pkg) => { pkg.version = version; });
+          stamp("src-tauri/tauri.conf.json", (conf) => { conf.version = version; });
+          const cargoPath = "src-tauri/Cargo.toml";
+          const cargo = fs.readFileSync(cargoPath, "utf8").replace(
+            /^version = "[^"]+"/m,
+            `version = "${version}"`
+          );
+          fs.writeFileSync(cargoPath, cargo);
+          EOF
       - name: Install UI deps
         working-directory: local/ui
         run: npm install
@@ -67,3 +120,135 @@ jobs:
           name: installers-${{ matrix.platform }}
           path: |
             local/app/src-tauri/target/release/bundle/**
+
+  npm-packages:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - path: local/sdk/js
+            name: mcp-monitor-local-sdk
+          - path: cloud/sdk/js
+            name: mcp-monitor-sdk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Stamp and publish npm package
+        working-directory: ${{ matrix.path }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          PACKAGE_NAME: ${{ matrix.name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "NPM_TOKEN secret is required" >&2
+            exit 1
+          fi
+          npm version "$RELEASE_VERSION" --no-git-tag-version
+          npm install
+          if npm view "${PACKAGE_NAME}@${RELEASE_VERSION}" version >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${RELEASE_VERSION} already on npm"
+            exit 0
+          fi
+          npm publish --access public
+
+  pypi-packages:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - path: local/sdk/py
+          - path: cloud/sdk/py
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Stamp version
+        working-directory: ${{ matrix.path }}
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          python - <<'EOF'
+          import os
+          import re
+          from pathlib import Path
+
+          version = os.environ["RELEASE_VERSION"]
+          path = Path("pyproject.toml")
+          text, count = re.subn(
+              r'(?m)^version = "[^"]+"',
+              f'version = "{version}"',
+              path.read_text(),
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("failed to stamp pyproject.toml version")
+          path.write_text(text)
+          EOF
+      - name: Build sdist and wheel
+        working-directory: ${{ matrix.path }}
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: ${{ matrix.path }}/dist
+          skip-existing: true
+
+  github-release:
+    needs: [prepare, server-image, desktop-installers, npm-packages, pypi-packages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: installers-*
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find dist -type f \( \
+            -name '*.dmg' -o \
+            -name '*.deb' -o \
+            -name '*.AppImage' -o \
+            -name '*.rpm' -o \
+            -name '*.msi' -o \
+            -name '*.exe' -o \
+            -name '*.app.tar.gz' \
+          \))
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No installer files found to attach" >&2
+            exit 1
+          fi
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$TAG" \
+              --repo "${{ github.repository }}" \
+              --clobber \
+              "${files[@]}"
+          else
+            gh release create "$TAG" \
+              --repo "${{ github.repository }}" \
+              --title "$TAG" \
+              --generate-notes \
+              "${files[@]}"
+          fi

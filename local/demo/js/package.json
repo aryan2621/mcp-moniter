@@ -11,7 +11,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",
     "zod": "^4.0.0",
-    "@local/mcp-monitor-sdk": "file:../../sdk/js"
+    "mcp-monitor-local-sdk": "file:../../sdk/js"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

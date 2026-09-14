@@ -19,4 +19,4 @@ dependencies = [
 packages = ["src/mcp_monitor_sdk"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/mcp_monitor_sdk", "README.md"]
+include = ["src/mcp_monitor_sdk", "README.md", "USER.md", "DEV.md"]

@@ -3,7 +3,7 @@ name = "mcp-monitor-demo-py"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
-  "mcp-monitor-sdk @ file:../../sdk/py",
+  "mcp-monitor-local-sdk @ file:../../sdk/py",
 ]
 
 [tool.hatch.metadata]

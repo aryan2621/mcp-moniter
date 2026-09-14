@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { MonitoredMcpServer } from "@local/mcp-monitor-sdk";
+import { MonitoredMcpServer } from "mcp-monitor-local-sdk";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { validateEnv } from "./config/env.js";

@@ -1,13 +1,19 @@
-# mcp-monitor-sdk (JavaScript)
+# mcp-monitor-local-sdk (JavaScript)
 
-Self-host monitoring SDK for MCP servers. Same ingest contract as the Python SDK.
+Self-host monitoring SDK for MCP servers. [User guide](#user-guide) · [Developer guide](#developer-guide)
+
+Repo copies: [USER.md](USER.md) · [DEV.md](DEV.md)
+
+## User guide
+
+Point this SDK at your self-host API (`metricsServerUrl` + `instanceSecret`). It wraps tool handlers and sends tool-call metrics (name, duration, success/error) — not application logs — to `POST /v1/metrics`. Open the local UI or desktop app to see them. This package does not talk to the hosted dashboard.
 
 ```bash
-npm install mcp-monitor-sdk
+npm install mcp-monitor-local-sdk
 ```
 
 ```ts
-import { MonitoredMcpServer } from "mcp-monitor-sdk";
+import { MonitoredMcpServer } from "mcp-monitor-local-sdk";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 const server = new MonitoredMcpServer(
@@ -27,7 +33,13 @@ const transport = new StdioServerTransport();
 await server.connect(transport);
 ```
 
-## Options
+`instanceSecret` must match `INSTANCE_SECRET` on the API.
+
+## Developer guide
+
+Same ingest contract as the Python SDK.
+
+### Options
 
 | Option | Required | Default | Notes |
 |---|---|---|---|
@@ -42,4 +54,4 @@ await server.connect(transport);
 
 Failed flushes are put back on the buffer. `close()` stops the timer and drains remaining events.
 
-This package in the repo is referenced by demos as `@local/mcp-monitor-sdk`.
+Local checkout: `file:../../sdk/js` from [demo/js](../../demo/js).

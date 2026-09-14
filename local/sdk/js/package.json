@@ -1,5 +1,5 @@
 {
-  "name": "mcp-monitor-sdk",
+  "name": "mcp-monitor-local-sdk",
   "version": "0.1.0",
   "description": "Self-host monitoring SDK for MCP servers",
   "type": "module",
@@ -12,7 +12,7 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "README.md", "USER.md", "DEV.md"],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build",
