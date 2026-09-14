@@ -1,0 +1,19 @@
+{
+  "name": "mcp-monitor-cloud-test-js",
+  "private": true,
+  "version": "0.1.1",
+  "type": "module",
+  "scripts": {
+    "inventory-server": "tsx inventory-mcp-server.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "mcp-monitor-sdk": "0.1.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

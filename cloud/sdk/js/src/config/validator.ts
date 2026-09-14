@@ -7,6 +7,7 @@ const DEFAULT_METRICS_SERVER_URL =
 const DEFAULT_TIMEOUT = 5000;
 const DEFAULT_RETRY_ATTEMPTS = 2;
 const DEFAULT_BATCH_SIZE = 10;
+const DEFAULT_FLUSH_INTERVAL_MS = 5000;
 const DEFAULT_LOG_LEVEL = "info";
 
 export const MONITOR_LIMITS = {
@@ -14,6 +15,7 @@ export const MONITOR_LIMITS = {
   MAX_RETRY_ATTEMPTS: 5,
   MAX_TIMEOUT_MS: 30_000,
   MAX_PENDING_EVENTS: 10_000,
+  MAX_FLUSH_INTERVAL_MS: 60_000,
 } as const;
 
 export const MonitorOptionsSchema = z.object({
@@ -23,6 +25,11 @@ export const MonitorOptionsSchema = z.object({
     .number()
     .positive()
     .max(MONITOR_LIMITS.MAX_BATCH_SIZE)
+    .optional(),
+  flushIntervalMs: z
+    .number()
+    .positive()
+    .max(MONITOR_LIMITS.MAX_FLUSH_INTERVAL_MS)
     .optional(),
   logLevel: z.enum(["debug", "info", "warn", "error", "silent"]).optional(),
   timeout: z
@@ -40,6 +47,7 @@ export const MonitorOptionsSchema = z.object({
 export interface ValidatedMonitorOptions {
   apiKey: string;
   batchSize: number;
+  flushIntervalMs: number;
   logLevel: "debug" | "info" | "warn" | "error" | "silent";
   metricsServerUrl: string;
   timeout: number;
@@ -61,6 +69,7 @@ export function validateMonitorOptions(
     return {
       apiKey: validated.apiKey,
       batchSize: validated.batchSize ?? DEFAULT_BATCH_SIZE,
+      flushIntervalMs: validated.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS,
       logLevel: validated.logLevel ?? DEFAULT_LOG_LEVEL,
       metricsServerUrl: validated.metricsServerUrl ?? DEFAULT_METRICS_SERVER_URL,
       timeout: validated.timeout ?? DEFAULT_TIMEOUT,

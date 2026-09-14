@@ -24,6 +24,7 @@ export class MonitoredMcpServer {
   private collector: MetricsCollector;
   private eventWrapper: EventWrapper;
   private logger: Logger;
+  private closing = false;
 
   constructor(
     serverInfo: Implementation,
@@ -70,6 +71,20 @@ export class MonitoredMcpServer {
       config.flushIntervalMs
     );
     this.eventWrapper = new EventWrapper();
+    this.bindShutdown();
+  }
+
+  private bindShutdown(): void {
+    const onSignal = () => {
+      void this.close().finally(() => {
+        process.exit(0);
+      });
+    };
+    process.once("SIGINT", onSignal);
+    process.once("SIGTERM", onSignal);
+    process.once("beforeExit", () => {
+      void this.close();
+    });
   }
 
   async connect(transport: McpTransport): Promise<void> {
@@ -78,6 +93,10 @@ export class MonitoredMcpServer {
   }
 
   async close(): Promise<void> {
+    if (this.closing) {
+      return;
+    }
+    this.closing = true;
     this.logger.info("Closing MonitoredMcpServer");
     this.collector.stop();
     await this.collector.flush();

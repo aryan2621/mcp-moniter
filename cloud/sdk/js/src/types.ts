@@ -14,6 +14,7 @@ export interface MonitorOptions {
   apiKey: string;
   metricsServerUrl?: string;
   batchSize?: number;
+  flushIntervalMs?: number;
   logLevel?: "debug" | "info" | "warn" | "error" | "silent";
   timeout?: number;
   retryAttempts?: number;

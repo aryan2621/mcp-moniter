@@ -52,6 +52,6 @@ Same ingest contract as the Python SDK.
 | `flushIntervalMs` | no | 5000 | |
 | `logLevel` | no | `info` | `debug` \| `info` \| `warn` \| `error` \| `silent` |
 
-Failed flushes are put back on the buffer. `close()` stops the timer and drains remaining events.
+Events flush when the batch is full or every `flushIntervalMs`. Failed flushes are restored. Shutdown drains remaining events.
 
 Local checkout: `file:../../sdk/js` from [demo/js](../../demo/js).

@@ -17,7 +17,7 @@ User-facing flow: [USER.md](USER.md).
 | `flush_interval_ms` | no | 5000 | |
 | `log_level` | no | `info` | `debug` \| `info` \| `warn` \| `error` \| `silent` |
 
-Failed flushes are restored to the buffer. Process exit drains remaining events over a sync HTTP POST.
+Events flush when the batch is full or every `flush_interval_ms`. Failed flushes are restored. Shutdown drains remaining events.
 
 Local checkout:
 

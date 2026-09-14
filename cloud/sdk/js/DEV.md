@@ -23,10 +23,11 @@ new MonitoredMcpServer(
 | `apiKey` | yes | | Min 64 characters; sent as `X-API-Key` |
 | `metricsServerUrl` | no | Workers `/v1/metrics` | Full ingest URL |
 | `batchSize` | no | 10 | Max 100 |
+| `flushIntervalMs` | no | 5000 | Max 60000 |
 | `retryAttempts` | no | 2 | `0` still tries once |
 | `timeout` | no | 5000 ms | |
 | `logLevel` | no | `info` | `debug` \| `info` \| `warn` \| `error` \| `silent` |
 
-Failed flushes are restored to the buffer. `close()` drains remaining events. Body is a JSON array of `ToolCallEvent` objects, not `{ serverName, events }`.
+Events flush when the batch is full or every `flushIntervalMs`. Failed flushes are restored. Shutdown drains remaining events. Body is a JSON array of `ToolCallEvent` objects, not `{ serverName, events }`.
 
 This package in the repo is referenced by demos as `@local/mcp-monitor-sdk`.

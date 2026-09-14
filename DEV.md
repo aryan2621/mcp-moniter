@@ -89,6 +89,9 @@ cloud/
   web/server  Workers API
   web/client  Clerk dashboard
   demo        sample MCP servers
+test/
+  js          inventory MCP (published npm SDK)
+  python      shop MCP (published PyPI SDK)
 .github/workflows/release.yml
 ```
 

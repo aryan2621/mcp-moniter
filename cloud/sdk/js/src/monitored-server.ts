@@ -13,7 +13,7 @@ import type {
 import { MetricsCollector } from "./metrics-collector.js";
 import { EventWrapper } from "./core/event-wrapper.js";
 import { HttpSender } from "./transport/http-sender.js";
-import { validateMonitorOptions } from "./config/validator.js";
+import { MONITOR_LIMITS, validateMonitorOptions } from "./config/validator.js";
 import { ConsoleLogger } from "./logger/console-logger.js";
 import { LogLevel } from "./logger/logger.js";
 import type { Logger } from "./logger/logger.js";
@@ -24,6 +24,7 @@ export class MonitoredMcpServer {
   private collector: MetricsCollector;
   private eventWrapper: EventWrapper;
   private logger: Logger;
+  private closing = false;
 
   constructor(
     serverInfo: Implementation,
@@ -49,6 +50,7 @@ export class MonitoredMcpServer {
       serverName: serverInfo.name,
       serverVersion: serverInfo.version,
       batchSize: config.batchSize,
+      flushIntervalMs: config.flushIntervalMs,
       hasMetricsUrl: !!config.metricsServerUrl,
     });
 
@@ -66,9 +68,25 @@ export class MonitoredMcpServer {
     this.collector = new MetricsCollector(
       config.batchSize,
       this.logger,
-      transport
+      transport,
+      MONITOR_LIMITS.MAX_PENDING_EVENTS,
+      config.flushIntervalMs
     );
     this.eventWrapper = new EventWrapper();
+    this.bindShutdown();
+  }
+
+  private bindShutdown(): void {
+    const onSignal = () => {
+      void this.close().finally(() => {
+        process.exit(0);
+      });
+    };
+    process.once("SIGINT", onSignal);
+    process.once("SIGTERM", onSignal);
+    process.once("beforeExit", () => {
+      void this.close();
+    });
   }
 
   async connect(transport: McpTransport): Promise<void> {
@@ -77,7 +95,12 @@ export class MonitoredMcpServer {
   }
 
   async close(): Promise<void> {
+    if (this.closing) {
+      return;
+    }
+    this.closing = true;
     this.logger.info("Closing MonitoredMcpServer");
+    this.collector.stop();
     await this.collector.flush();
     await this.server.close();
   }

@@ -7,15 +7,20 @@ import { MONITOR_LIMITS } from "./config/validator.js";
 export class MetricsCollector {
   private buffer: EventBuffer;
   private transport?: Transport;
+  private flushTimer?: ReturnType<typeof setInterval>;
 
   constructor(
     batchSize: number,
     private logger: Logger,
     transport?: Transport,
-    maxPending = MONITOR_LIMITS.MAX_PENDING_EVENTS
+    maxPending = MONITOR_LIMITS.MAX_PENDING_EVENTS,
+    flushIntervalMs = 5000
   ) {
     this.buffer = new EventBuffer(batchSize, maxPending, logger);
     this.transport = transport;
+    this.flushTimer = setInterval(() => {
+      void this.flush();
+    }, flushIntervalMs);
   }
 
   async recordEvent(event: ToolCallEvent): Promise<void> {
@@ -54,6 +59,13 @@ export class MetricsCollector {
         });
         this.buffer.restore(events);
       }
+    }
+  }
+
+  stop(): void {
+    if (this.flushTimer) {
+      clearInterval(this.flushTimer);
+      this.flushTimer = undefined;
     }
   }
 
